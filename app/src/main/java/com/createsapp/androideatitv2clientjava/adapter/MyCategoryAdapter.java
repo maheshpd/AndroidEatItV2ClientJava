@@ -13,8 +13,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
+import com.createsapp.androideatitv2clientjava.callback.IRecyclerClickListener;
+import com.createsapp.androideatitv2clientjava.eventbus.CategoryClick;
 import com.createsapp.androideatitv2clientjava.model.CategoryModel;
 
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +48,12 @@ public class MyCategoryAdapter extends RecyclerView.Adapter<MyCategoryAdapter.My
     public void onBindViewHolder(@NonNull MyCategoryViewHolder holder, int position) {
         Glide.with(context).load(categoryModelArrayList.get(position).getImage()).into(holder.category_image);
         holder.category_name.setText(new StringBuilder(categoryModelArrayList.get(position).getName()));
+
+        //Event
+        holder.setListener((view, pos) -> {
+            Common.categorySelected = categoryModelArrayList.get(pos);
+            EventBus.getDefault().postSticky(new CategoryClick(true,categoryModelArrayList.get(pos)));
+        });
     }
 
     @Override
@@ -59,22 +69,33 @@ public class MyCategoryAdapter extends RecyclerView.Adapter<MyCategoryAdapter.My
             if (categoryModelArrayList.size() % 2 == 0)
                 return Common.DEFAULT_COLUMN_COUNT;
             else {
-                return (position > 1 && position == categoryModelArrayList.size() - 1) ? Common.FULL_WIDTH_COLUMN:Common.DEFAULT_COLUMN_COUNT;
+                return (position > 1 && position == categoryModelArrayList.size() - 1) ? Common.FULL_WIDTH_COLUMN : Common.DEFAULT_COLUMN_COUNT;
             }
         }
     }
 
-    public class MyCategoryViewHolder extends RecyclerView.ViewHolder {
+    public class MyCategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         Unbinder unbinder;
         @BindView(R.id.category_image)
         ImageView category_image;
         @BindView(R.id.category_name)
         TextView category_name;
 
+        IRecyclerClickListener listener;
+
+        public void setListener(IRecyclerClickListener listener) {
+            this.listener = listener;
+        }
+
         public MyCategoryViewHolder(@NonNull View itemView) {
             super(itemView);
+            unbinder = ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
 
-            unbinder = ButterKnife.bind(this,itemView);
+        @Override
+        public void onClick(View v) {
+            listener.onItemClickListener(v,getAdapterPosition());
         }
     }
 }
