@@ -11,9 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
+import com.createsapp.androideatitv2clientjava.callback.IRecyclerClickListener;
+import com.createsapp.androideatitv2clientjava.eventbus.FoodItemClick;
 import com.createsapp.androideatitv2clientjava.model.FoodModel;
 
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +49,19 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.Fo
         Glide.with(context).load(foodlists.get(position).getImage()).into(holder.img_food_image);
 
         holder.txt_food_price.setText(new StringBuilder("$")
-        .append(foodlists.get(position).getPrice()));
+                .append(foodlists.get(position).getPrice()));
 
         holder.txt_food_name.setText(new StringBuilder("")
-        .append(foodlists.get(position).getName()));
+                .append(foodlists.get(position).getName()));
+
+        //Event
+        holder.setListener(new IRecyclerClickListener() {
+            @Override
+            public void onItemClickListener(View view, int position) {
+                Common.selectedFood = foodlists.get(position);
+                EventBus.getDefault().postSticky(new FoodItemClick(true, foodlists.get(position)));
+            }
+        });
 
     }
 
@@ -56,7 +70,7 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.Fo
         return foodlists.size();
     }
 
-    public class FoodListViewHolder extends RecyclerView.ViewHolder {
+    public class FoodListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Unbinder unbinder;
         @BindView(R.id.txt_food_name)
         TextView txt_food_name;
@@ -68,9 +82,22 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.Fo
         ImageView img_fav;
         @BindView(R.id.img_quick_cart)
         ImageView img_quick_cart;
+
+        IRecyclerClickListener listener;
+
+        public void setListener(IRecyclerClickListener listener) {
+            this.listener = listener;
+        }
+
         public FoodListViewHolder(@NonNull View itemView) {
             super(itemView);
-            unbinder = ButterKnife.bind(this,itemView);
+            unbinder = ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onItemClickListener(v, getAdapterPosition());
         }
     }
 }

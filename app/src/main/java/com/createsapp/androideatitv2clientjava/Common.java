@@ -1,6 +1,7 @@
 package com.createsapp.androideatitv2clientjava;
 
 import com.createsapp.androideatitv2clientjava.model.CategoryModel;
+import com.createsapp.androideatitv2clientjava.model.FoodModel;
 import com.createsapp.androideatitv2clientjava.model.UserModel;
 
 public class Common {
@@ -12,4 +13,5 @@ public class Common {
     public static final String CATEGORY_REF = "Category";
     public static UserModel currentUser;
     public static CategoryModel categorySelected;
+    public static FoodModel selectedFood;
 }
