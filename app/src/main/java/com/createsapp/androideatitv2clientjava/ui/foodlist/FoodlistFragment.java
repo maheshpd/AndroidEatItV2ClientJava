@@ -40,7 +40,7 @@ public class FoodlistFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        foodListViewModel =
+         foodListViewModel =
                 ViewModelProviders.of(this).get(FoodListViewModel.class);
         View root = inflater.inflate(R.layout.fragment_food_list, container, false);
         unbinder = ButterKnife.bind(this, root);
