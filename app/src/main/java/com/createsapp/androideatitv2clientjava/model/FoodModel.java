@@ -4,12 +4,16 @@ import java.util.List;
 
 public class FoodModel {
     private String key;
-    private String name,image,id,description;
+    private String name, image, id, description;
     private String price;
     private List<AddonModel> addon;
     private List<SizeModel> size;
     private Double ratingValue;
     private Long ratingCount;
+
+    //For Cart
+    private List<AddonModel> userSelectedAddon;
+    private SizeModel userSelectedSize;
 
     public FoodModel() {
     }
@@ -92,5 +96,21 @@ public class FoodModel {
 
     public void setRatingCount(Long ratingCount) {
         this.ratingCount = ratingCount;
+    }
+
+    public List<AddonModel> getUserSelectedAddon() {
+        return userSelectedAddon;
+    }
+
+    public void setUserSelectedAddon(List<AddonModel> userSelectedAddon) {
+        this.userSelectedAddon = userSelectedAddon;
+    }
+
+    public SizeModel getUserSelectedSize() {
+        return userSelectedSize;
+    }
+
+    public void setUserSelectedSize(SizeModel userSelectedSize) {
+        this.userSelectedSize = userSelectedSize;
     }
 }

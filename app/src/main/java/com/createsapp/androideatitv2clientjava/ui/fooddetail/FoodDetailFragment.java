@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +27,7 @@ import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
 import com.createsapp.androideatitv2clientjava.model.CommentModel;
 import com.createsapp.androideatitv2clientjava.model.FoodModel;
+import com.createsapp.androideatitv2clientjava.model.SizeModel;
 import com.createsapp.androideatitv2clientjava.ui.comment.CommentFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
@@ -65,6 +69,8 @@ public class FoodDetailFragment extends Fragment {
     RatingBar ratingBar;
     @BindView(R.id.btnShowComment)
     Button btnShowComment;
+    @BindView(R.id.rdi_group_size)
+    RadioGroup rdi_group_size;
 
     @OnClick(R.id.btn_rating)
     void onRatingButtonClick() {
@@ -221,10 +227,48 @@ public class FoodDetailFragment extends Fragment {
         food_price.setText(new StringBuilder(foodModel.getPrice()));
 
         if (foodModel.getRatingValue() != null)
-        ratingBar.setRating(foodModel.getRatingValue().floatValue());
+            ratingBar.setRating(foodModel.getRatingValue().floatValue());
 
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
                 .setTitle(Common.selectedFood.getName());
+
+        //Size
+        for (SizeModel sizeModel : Common.selectedFood.getSize()) {
+            RadioButton radioButton = new RadioButton(getContext());
+            radioButton.setOnCheckedChangeListener((compoundButton, b) -> {
+                if (b)
+                    Common.selectedFood.setUserSelectedSize(sizeModel);
+                calculateTotalPrice(); //Update price
+            });
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    1.0f);
+            radioButton.setLayoutParams(params);
+            radioButton.setText(sizeModel.getName());
+            radioButton.setTag(sizeModel.getPrice());
+
+            rdi_group_size.addView(radioButton);
+        }
+
+        if (rdi_group_size.getChildCount() > 0) {
+            RadioButton radioButton = (RadioButton) rdi_group_size.getChildAt(0);
+            radioButton.setChecked(true); //Default first select
+        }
+
+        calculateTotalPrice();
+    }
+
+    private void calculateTotalPrice() {
+        double totalPrice = Double.parseDouble(Common.selectedFood.getPrice()), displayPrice = 0.0;
+
+        //Size
+        totalPrice += Double.parseDouble(Common.selectedFood.getUserSelectedSize().getPrice());
+
+        displayPrice = totalPrice * (Integer.parseInt(numberButton.getNumber()));
+        displayPrice = Math.round(displayPrice * 100.0 / 100.0);
+
+        food_price.setText(new StringBuilder().append(Common.formatPrice(displayPrice)).toString());
     }
 }
