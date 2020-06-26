@@ -58,11 +58,12 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
     private FoodDetailViewModel foodDetailViewModel;
     private Unbinder unbinder;
     private android.app.AlertDialog waitingDialog;
+    @BindView(R.id.img_add_addon)
+    ImageView img_add_addon;
+
     //View need inflate
     ChipGroup chip_group_addon;
     EditText edt_search;
-    @BindView(R.id.chip_group_user_selected_addon)
-    ChipGroup chip_group_user_selected_addon;
 
 
     @BindView(R.id.img_food)
@@ -85,7 +86,10 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
     Button btnShowComment;
     @BindView(R.id.rdi_group_size)
     RadioGroup rdi_group_size;
+    @BindView(R.id.chip_group_user_selected_addon)
+    ChipGroup chip_group_user_selected_addon;
     private BottomSheetDialog addonBottomSheetDialog;
+
 
     @OnClick(R.id.btn_rating)
     void onRatingButtonClick() {
@@ -161,8 +165,6 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
             commentModel.setCommentTimeStamp(serverTimeStamp);
 
 
-
-
             foodDetailViewModel.setCommentModel(commentModel);
         });
 
@@ -219,7 +221,7 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
             for (AddonModel addonModel : Common.selectedFood.getUserSelectedAddon()) //Add all available addon to list
             {
                 Chip chip = (Chip) getLayoutInflater().inflate(R.layout.layout_chip_with_delete_icon, null);
-                chip.setText(new StringBuilder(addonModel.getName()).append("(")
+                chip.setText(new StringBuilder(addonModel.getName()).append("(+$")
                         .append(addonModel.getPrice()).append(")"));
                 chip.setClickable(false);
                 chip.setOnCloseIconClickListener(view -> {
@@ -376,7 +378,6 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
 
         for (AddonModel addonModel : Common.selectedFood.getAddon()) {
             if (addonModel.getName().toLowerCase().contains(charSequence.toString().toLowerCase()))
-                ;
             {
                 Chip chip = (Chip) getLayoutInflater().inflate(R.layout.layout_addon_item, null);
                 chip.setText(new StringBuilder(addonModel.getName()).append("(+$")
