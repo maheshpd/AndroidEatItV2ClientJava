@@ -2,11 +2,11 @@ package com.createsapp.androideatitv2clientjava.database;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 public class LocalCartDataSource implements CartDataSource {
-
     private CartDAO cartDAO;
 
     public LocalCartDataSource(CartDAO cartDAO) {
@@ -34,8 +34,8 @@ public class LocalCartDataSource implements CartDataSource {
     }
 
     @Override
-    public Single<Integer> insertOrReplaceAll(CartItem cartItem) {
-        return null;
+    public Completable insertOrReplaceAll(CartItem cartItem) {
+        return cartDAO.insertOrReplaceAll(cartItem);
     }
 
     @Override

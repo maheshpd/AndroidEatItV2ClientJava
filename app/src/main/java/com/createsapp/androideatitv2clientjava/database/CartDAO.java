@@ -28,7 +28,7 @@ public interface CartDAO {
     Single<CartItem> getItemInCart(String foodId, String uid);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertOrReplaceAll(CartItem cartItem);
+    Completable insertOrReplaceAll(CartItem... cartItem);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     Single<Integer> updateCartItems(CartItem cartItem);

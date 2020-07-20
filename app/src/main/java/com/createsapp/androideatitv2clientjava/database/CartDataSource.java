@@ -2,6 +2,7 @@ package com.createsapp.androideatitv2clientjava.database;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -14,7 +15,7 @@ public interface CartDataSource {
 
     Single<CartItem> getItemInCart(String foodId, String uid);
 
-    Single<Integer> insertOrReplaceAll(CartItem cartItem);
+    Completable insertOrReplaceAll(CartItem cartItem);
 
     Single<Integer> updateCartItems(CartItem cartItem);
 

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,27 +15,39 @@ import com.bumptech.glide.Glide;
 import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
 import com.createsapp.androideatitv2clientjava.callback.IRecyclerClickListener;
+import com.createsapp.androideatitv2clientjava.database.CartDataSource;
+import com.createsapp.androideatitv2clientjava.database.CartDatabase;
+import com.createsapp.androideatitv2clientjava.database.CartItem;
+import com.createsapp.androideatitv2clientjava.database.LocalCartDataSource;
+import com.createsapp.androideatitv2clientjava.eventbus.CounterCartEvent;
 import com.createsapp.androideatitv2clientjava.eventbus.FoodItemClick;
 import com.createsapp.androideatitv2clientjava.model.FoodModel;
 
-
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.FoodListViewHolder> {
 
     Context context;
     List<FoodModel> foodlists;
 
+    private CompositeDisposable compositeDisposable;
+    private CartDataSource cartDataSource;
+
     public MyFoodListAdapter(Context context, List<FoodModel> subject) {
         this.context = context;
         this.foodlists = subject;
+        this.compositeDisposable = new CompositeDisposable();
+        this.cartDataSource = new LocalCartDataSource(CartDatabase.getInstance(context).cartDAO());
     }
 
     @NonNull
@@ -51,7 +64,7 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.Fo
         holder.txt_food_price.setText(new StringBuilder("$")
                 .append(foodlists.get(position).getPrice()));
 
-        holder.txt_food_name.setText(new StringBuilder("")
+        holder.txt_food_name.setText(new StringBuilder()
                 .append(foodlists.get(position).getName()));
 
         //Event
@@ -62,6 +75,33 @@ public class MyFoodListAdapter extends RecyclerView.Adapter<MyFoodListAdapter.Fo
                 Common.selectedFood.setKey(String.valueOf(position));
                 EventBus.getDefault().postSticky(new FoodItemClick(true, foodlists.get(position)));
             }
+        });
+
+        holder.img_quick_cart.setOnClickListener(view -> {
+            CartItem cartItem = new CartItem();
+            cartItem.setUid(Common.currentUser.getUid());
+            cartItem.setUserPhone(Common.currentUser.getPhone());
+
+            cartItem.setFoodId(foodlists.get(position).getId());
+            cartItem.setFoodName(foodlists.get(position).getName());
+            cartItem.setFoodImage(foodlists.get(position).getImage());
+            cartItem.setFoodPrice(Double.valueOf(String.valueOf(foodlists.get(position).getPrice())));
+            cartItem.setFoodQuantity(1);
+            cartItem.setFoodExtraPrice(0.0); //Because default we not choose size + addon so extra price is 0
+            cartItem.setFoodAddon("Default");
+            cartItem.setFoodSize("Default");
+
+            compositeDisposable.add(cartDataSource.insertOrReplaceAll(cartItem)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(() -> {
+                        Toast.makeText(context, "Add to Cart success", Toast.LENGTH_SHORT).show();
+//                 Here we will send a notify to HomeActivity to update counter in cart
+                        EventBus.getDefault().postSticky(new CounterCartEvent(true));
+                    }, throwable -> {
+                        Toast.makeText(context, "[CART ERROR]" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }));
+
         });
 
     }

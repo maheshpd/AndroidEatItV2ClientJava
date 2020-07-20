@@ -31,14 +31,13 @@ public class CartItem {
     private Double foodExtraPrice;
 
     @ColumnInfo(name = "foodAddon")
-    private Double foodAddon;
+    private String foodAddon;
 
     @ColumnInfo(name = "foodSize")
-    private Double foodSize;
+    private String foodSize;
 
     @ColumnInfo(name = "uid")
     private String uid;
-
 
     @NonNull
     public String getFoodId() {
@@ -97,19 +96,19 @@ public class CartItem {
         this.foodExtraPrice = foodExtraPrice;
     }
 
-    public Double getFoodAddon() {
+    public String getFoodAddon() {
         return foodAddon;
     }
 
-    public void setFoodAddon(Double foodAddon) {
+    public void setFoodAddon(String foodAddon) {
         this.foodAddon = foodAddon;
     }
 
-    public Double getFoodSize() {
+    public String getFoodSize() {
         return foodSize;
     }
 
-    public void setFoodSize(Double foodSize) {
+    public void setFoodSize(String foodSize) {
         this.foodSize = foodSize;
     }
 

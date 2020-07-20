@@ -1,30 +1,41 @@
 package com.createsapp.androideatitv2clientjava;
 
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Menu;
 import android.widget.Toast;
 
-import com.createsapp.androideatitv2clientjava.eventbus.CategoryClick;
-import com.createsapp.androideatitv2clientjava.eventbus.FoodItemClick;
-import com.createsapp.androideatitv2clientjava.model.CategoryModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.navigation.NavigationView;
-
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
+import com.andremion.counterfab.CounterFab;
+import com.createsapp.androideatitv2clientjava.database.CartDataSource;
+import com.createsapp.androideatitv2clientjava.database.CartDatabase;
+import com.createsapp.androideatitv2clientjava.database.LocalCartDataSource;
+import com.createsapp.androideatitv2clientjava.eventbus.CategoryClick;
+import com.createsapp.androideatitv2clientjava.eventbus.CounterCartEvent;
+import com.createsapp.androideatitv2clientjava.eventbus.FoodItemClick;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import io.reactivex.SingleObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -33,10 +44,25 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private NavController navController;
 
+    @BindView(R.id.fab)
+    CounterFab fab;
+    private CartDataSource cartDataSource;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        countCartItem();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        ButterKnife.bind(this);
+        cartDataSource = new LocalCartDataSource(CartDatabase.getInstance(this).cartDAO());
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -52,7 +78,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_menu, R.id.nav_food_list,R.id.nav_food_detail)
+                R.id.nav_home, R.id.nav_menu, R.id.nav_food_list, R.id.nav_food_detail)
                 .setDrawerLayout(drawer)
                 .build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -60,6 +86,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(navigationView, navController);
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.bringToFront();
+
+        countCartItem();
     }
 
     @Override
@@ -118,5 +146,34 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         if (event.isSuccess()) {
             navController.navigate(R.id.nav_food_detail);
         }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onCartCounter(CounterCartEvent event) {
+        if (event.isSuccess()) {
+            countCartItem();
+        }
+    }
+
+    private void countCartItem() {
+        cartDataSource.countItemInCart(Common.currentUser.getUid())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new SingleObserver<Integer>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        fab.setCount(integer);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(HomeActivity.this, "[COUNT CART]" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

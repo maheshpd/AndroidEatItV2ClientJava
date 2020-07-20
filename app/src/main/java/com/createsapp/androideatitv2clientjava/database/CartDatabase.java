@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase;
 
 @Database(version = 1, entities = CartItem.class, exportSchema = false)
 public abstract class CartDatabase extends RoomDatabase {
+    public abstract CartDAO cartDAO();
     private static CartDatabase instance;
 
     public static CartDatabase getInstance(Context context) {
@@ -16,5 +17,4 @@ public abstract class CartDatabase extends RoomDatabase {
         return instance;
     }
 
-    public abstract CartDAO cartDAO();
 }
