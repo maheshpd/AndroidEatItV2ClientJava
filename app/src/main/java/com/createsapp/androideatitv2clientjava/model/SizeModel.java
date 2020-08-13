@@ -2,7 +2,7 @@ package com.createsapp.androideatitv2clientjava.model;
 
 public class SizeModel {
     private String name;
-    private String price;
+    private Long price;
 
     public SizeModel() {
     }
@@ -15,11 +15,11 @@ public class SizeModel {
         this.name = name;
     }
 
-    public String getPrice() {
+    public Long getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
 }

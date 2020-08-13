@@ -5,7 +5,7 @@ import java.util.List;
 public class FoodModel {
     private String key;
     private String name, image, id, description;
-    private String price;
+    private Long price;
     private List<AddonModel> addon;
     private List<SizeModel> size;
     private Double ratingValue;
@@ -50,11 +50,11 @@ public class FoodModel {
         this.description = description;
     }
 
-    public String getPrice() {
+    public Long getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(Long price) {
         this.price = price;
     }
 
