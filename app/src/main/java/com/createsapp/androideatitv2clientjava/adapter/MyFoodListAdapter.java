@@ -12,9 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
 import com.createsapp.androideatitv2clientjava.callback.IRecyclerClickListener;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.database.CartDataSource;
 import com.createsapp.androideatitv2clientjava.database.CartDatabase;
 import com.createsapp.androideatitv2clientjava.database.CartItem;

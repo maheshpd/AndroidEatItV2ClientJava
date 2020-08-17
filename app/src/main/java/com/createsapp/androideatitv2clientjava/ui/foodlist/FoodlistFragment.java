@@ -6,23 +6,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.R;
 import com.createsapp.androideatitv2clientjava.adapter.MyFoodListAdapter;
-import com.createsapp.androideatitv2clientjava.model.FoodModel;
-
-import java.util.List;
+import com.createsapp.androideatitv2clientjava.common.Common;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

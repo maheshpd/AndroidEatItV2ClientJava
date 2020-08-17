@@ -1,12 +1,11 @@
 package com.createsapp.androideatitv2clientjava.ui.menu;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.callback.ICategoryCallbackListener;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.model.CategoryModel;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

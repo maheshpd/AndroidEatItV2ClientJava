@@ -16,6 +16,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.andremion.counterfab.CounterFab;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.database.CartDataSource;
 import com.createsapp.androideatitv2clientjava.database.CartDatabase;
 import com.createsapp.androideatitv2clientjava.database.LocalCartDataSource;
@@ -184,7 +185,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(HomeActivity.this, "[COUNT CART]" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        if (!e.getMessage().contains("Query returned empty")) {
+
+                            Toast.makeText(HomeActivity.this, "[COUNT CART]" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        } else
+                            fab.setCount(0);
                     }
                 });
     }

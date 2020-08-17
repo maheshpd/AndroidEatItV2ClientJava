@@ -3,7 +3,7 @@ package com.createsapp.androideatitv2clientjava.ui.fooddetail;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.createsapp.androideatitv2clientjava.Common;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.model.CommentModel;
 import com.createsapp.androideatitv2clientjava.model.FoodModel;
 

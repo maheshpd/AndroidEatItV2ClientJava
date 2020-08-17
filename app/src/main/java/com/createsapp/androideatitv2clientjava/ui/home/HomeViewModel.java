@@ -1,16 +1,14 @@
 package com.createsapp.androideatitv2clientjava.ui.home;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.createsapp.androideatitv2clientjava.Common;
 import com.createsapp.androideatitv2clientjava.callback.IBestDealCallbackListener;
 import com.createsapp.androideatitv2clientjava.callback.IPopularCallbackListener;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.model.BestDealModel;
 import com.createsapp.androideatitv2clientjava.model.PopularCategoryModel;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

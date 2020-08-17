@@ -5,7 +5,7 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.createsapp.androideatitv2clientjava.Common;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.database.CartDataSource;
 import com.createsapp.androideatitv2clientjava.database.CartDatabase;
 import com.createsapp.androideatitv2clientjava.database.CartItem;

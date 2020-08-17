@@ -1,10 +1,9 @@
 package com.createsapp.androideatitv2clientjava.ui.foodlist;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.createsapp.androideatitv2clientjava.Common;
+import com.createsapp.androideatitv2clientjava.common.Common;
 import com.createsapp.androideatitv2clientjava.model.FoodModel;
 
 import java.util.List;

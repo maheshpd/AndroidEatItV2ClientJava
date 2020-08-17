@@ -1,4 +1,4 @@
-package com.createsapp.androideatitv2clientjava;
+package com.createsapp.androideatitv2clientjava.common;
 
 import com.createsapp.androideatitv2clientjava.model.AddonModel;
 import com.createsapp.androideatitv2clientjava.model.CategoryModel;
