@@ -1,5 +1,7 @@
 package com.createsapp.androideatitv2clientjava.ui.cart;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -9,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +45,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,6 +62,57 @@ public class CartFragment extends Fragment {
     TextView txt_empty_cart;
     @BindView(R.id.group_place_holder)
     CardView group_place_holder;
+
+    @OnClick(R.id.btn_place_order)
+    void onPlaceOrderClick() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("One more step");
+
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_place_order, null);
+
+        EditText edt_address = view.findViewById(R.id.edt_address);
+        RadioButton rdi_home = view.findViewById(R.id.rdi_home_address);
+        RadioButton rdi_other_address = view.findViewById(R.id.rdi_other_address);
+        RadioButton rdi_ship_to_this = view.findViewById(R.id.rdi_ship_this_address);
+        RadioButton rdi_cod = view.findViewById(R.id.rdi_cod);
+        RadioButton rdi_braintree = view.findViewById(R.id.rdi_braintree);
+
+        //Date
+        edt_address.setText(Common.currentUser.getAddress()); //By default we select home address, so user's address will display
+
+        //Event
+        rdi_home.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                edt_address.setText(Common.currentUser.getAddress());
+            }
+        });
+        rdi_other_address.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                edt_address.setText(""); //Clear
+                edt_address.setHint("Enter your address");
+            }
+        });
+        rdi_ship_to_this.setOnCheckedChangeListener((compoundButton, b) -> {
+            if (b) {
+                Toast.makeText(getContext(), "Implement late with Google API", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setView(view);
+        builder.setNegativeButton("No", (dialogInterface, i) -> {
+            dialogInterface.dismiss();
+        })
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Toast.makeText(getContext(), "Implement late!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private Parcelable recyclerViewState;
     private CartDataSource cartDataSource;
     private Unbinder unbinder;
@@ -153,7 +209,7 @@ public class CartFragment extends Fragment {
 
                     @Override
                     public void onSuccess(Double aDouble) {
-                        txt_total_price.setText(new StringBuilder().append(aDouble));
+                        txt_total_price.setText(new StringBuilder("Total: $").append(aDouble));
                     }
 
                     @Override
@@ -232,7 +288,7 @@ public class CartFragment extends Fragment {
 
                     @Override
                     public void onSuccess(Double price) {
-                        txt_total_price.setText(new StringBuilder("Total: ")
+                        txt_total_price.setText(new StringBuilder("Total: $")
                                 .append(Common.formatPrice(price)));
                     }
 
