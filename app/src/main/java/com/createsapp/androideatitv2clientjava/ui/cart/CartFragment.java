@@ -1,9 +1,13 @@
 package com.createsapp.androideatitv2clientjava.ui.cart;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -36,6 +41,12 @@ import com.createsapp.androideatitv2clientjava.database.LocalCartDataSource;
 import com.createsapp.androideatitv2clientjava.eventbus.CounterCartEvent;
 import com.createsapp.androideatitv2clientjava.eventbus.HideFABCart;
 import com.createsapp.androideatitv2clientjava.eventbus.UpdateItemInCart;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -54,6 +65,16 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CartFragment extends Fragment {
 
+    LocationRequest locationRequest;
+    LocationCallback locationCallback;
+    FusedLocationProviderClient fusedLocationProviderClient;
+    Location currentLocation;
+    MyCartAdapter adapter;
+    private Parcelable recyclerViewState;
+    private CartDataSource cartDataSource;
+    private Unbinder unbinder;
+    private CartViewModel cartViewModel;
+
     @BindView(R.id.recycler_cart)
     RecyclerView recycler_cart;
     @BindView(R.id.txt_total_price)
@@ -71,6 +92,8 @@ public class CartFragment extends Fragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.layout_place_order, null);
 
         EditText edt_address = view.findViewById(R.id.edt_address);
+        EditText edt_comment = view.findViewById(R.id.edt_comment);
+        TextView txt_address = view.findViewById(R.id.txt_address_detail);
         RadioButton rdi_home = view.findViewById(R.id.rdi_home_address);
         RadioButton rdi_other_address = view.findViewById(R.id.rdi_other_address);
         RadioButton rdi_ship_to_this = view.findViewById(R.id.rdi_ship_this_address);
@@ -84,6 +107,7 @@ public class CartFragment extends Fragment {
         rdi_home.setOnCheckedChangeListener((compoundButton, b) -> {
             if (b) {
                 edt_address.setText(Common.currentUser.getAddress());
+                txt_address.setVisibility(View.GONE);
             }
         });
         rdi_other_address.setOnCheckedChangeListener((compoundButton, b) -> {
@@ -94,7 +118,24 @@ public class CartFragment extends Fragment {
         });
         rdi_ship_to_this.setOnCheckedChangeListener((compoundButton, b) -> {
             if (b) {
-                Toast.makeText(getContext(), "Implement late with Google API", Toast.LENGTH_SHORT).show();
+                fusedLocationProviderClient.getLastLocation()
+                        .addOnCompleteListener(task -> {
+                            String coordinates = new StringBuilder()
+                                    .append(task.getResult().getLatitude())
+                                    .append("/")
+                                    .append(task.getResult().getLongitude()).toString();
+
+                            edt_address.setText(coordinates);
+                            txt_address.setText("Implement late with Google API (Need Biling project)");
+                            txt_address.setVisibility(View.VISIBLE);
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                txt_address.setVisibility(View.GONE);
+                            }
+                        });
             }
         });
 
@@ -113,13 +154,6 @@ public class CartFragment extends Fragment {
         dialog.show();
     }
 
-    private Parcelable recyclerViewState;
-    private CartDataSource cartDataSource;
-    private Unbinder unbinder;
-
-    MyCartAdapter adapter;
-
-    private CartViewModel cartViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -150,7 +184,37 @@ public class CartFragment extends Fragment {
 
         unbinder = ButterKnife.bind(this, root);
         initView();
+        initLocation();
         return root;
+    }
+
+    private void initLocation() {
+        buildLocationRequest();
+        buildLocationCallback();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+    }
+
+    private void buildLocationCallback() {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                currentLocation = locationResult.getLastLocation();
+            }
+        };
+    }
+
+    private void buildLocationRequest() {
+        locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setSmallestDisplacement(10f);
     }
 
     private void initView() {
@@ -247,7 +311,22 @@ public class CartFragment extends Fragment {
         cartViewModel.onStop();
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
+        if (fusedLocationProviderClient != null)
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+
         super.onStop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (fusedLocationProviderClient != null) {
+            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+        }
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
