@@ -107,7 +107,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         navigationView.bringToFront();
 
         View headerView = navigationView.getHeaderView(0);
-        TextView txt_user = (TextView) headerView.findViewById(R.id.txt_user);
+        TextView txt_user = headerView.findViewById(R.id.txt_user);
         Common.setSpanString("Hey, ", Common.currentUser.getName(), txt_user);
 
         countCartItem();
@@ -236,6 +236,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
                                 Common.categorySelected = snapshot.getValue(CategoryModel.class);
+                                Common.categorySelected.setMenu_id(snapshot.getKey());
 
                                 //Load food
                                 FirebaseDatabase.getInstance()
@@ -251,6 +252,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                                 if (snapshot.exists()) {
                                                     for (DataSnapshot itemSnapShot : snapshot.getChildren()) {
                                                         Common.selectedFood = itemSnapShot.getValue(FoodModel.class);
+                                                        Common.selectedFood.setKey(snapshot.getKey());
                                                     }
 
                                                     navController.navigate(R.id.nav_food_detail);
@@ -301,6 +303,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
                                 Common.categorySelected = snapshot.getValue(CategoryModel.class);
+                                Common.categorySelected.setMenu_id(snapshot.getKey());
 
                                 //Load food
                                 FirebaseDatabase.getInstance()
@@ -316,6 +319,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                                 if (snapshot.exists()) {
                                                     for (DataSnapshot itemSnapShot : snapshot.getChildren()) {
                                                         Common.selectedFood = itemSnapShot.getValue(FoodModel.class);
+                                                        Common.selectedFood.setKey(itemSnapShot.getKey());
                                                     }
 
                                                     navController.navigate(R.id.nav_food_detail);

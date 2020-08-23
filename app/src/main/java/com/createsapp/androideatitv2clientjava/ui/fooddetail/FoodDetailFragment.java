@@ -396,14 +396,14 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
                                 foodModel.setRatingCount(0l); //l = L lower case, not 1 (number one)
                             double sumRating = foodModel.getRatingValue() + ratingValue;
                             long ratingCount = foodModel.getRatingCount() + 1;
-                            double result = sumRating / ratingCount;
+
 
                             Map<String, Object> updateData = new HashMap<>();
-                            updateData.put("ratingValue", result);
+                            updateData.put("ratingValue", sumRating);
                             updateData.put("ratingCount", ratingCount);
 
                             //Update data in variable
-                            foodModel.setRatingValue(result);
+                            foodModel.setRatingValue(sumRating);
                             foodModel.setRatingCount(ratingCount);
 
                             dataSnapshot.getRef()
@@ -436,7 +436,7 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
         food_price.setText(new StringBuilder(foodModel.getPrice().toString()));
 
         if (foodModel.getRatingValue() != null)
-            ratingBar.setRating(foodModel.getRatingValue().floatValue());
+            ratingBar.setRating(foodModel.getRatingValue().floatValue() / foodModel.getRatingCount());
 
         ((AppCompatActivity) getActivity())
                 .getSupportActionBar()
@@ -479,7 +479,8 @@ public class FoodDetailFragment extends Fragment implements TextWatcher {
 
 
         //Size
-        totalPrice += Common.selectedFood.getUserSelectedSize().getPrice();
+        if (Common.selectedFood.getUserSelectedSize() != null)
+            totalPrice += Common.selectedFood.getUserSelectedSize().getPrice();
 
         displayPrice = totalPrice * (Integer.parseInt(numberButton.getNumber()));
         displayPrice = Math.round(displayPrice * 100.0 / 100.0);
